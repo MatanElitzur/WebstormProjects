@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Demo</title>
+
+    <style>
+        a.test {
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+
+</head>
+<body>
+<a href="http://jquery.com/">jQuery</a>
+<a href="http://www.youtube.com/watch?v=VbqIaJ8LqJI">Shaili</a>
+<a href="http://www.one.co.il">Matan</a>
+<!--
+<script src="./src/jquery.js"></script>
+-->
+<script src="jquery-ui-1.10.4.custom/js/jquery.min.js">
+
+    // Your code goes here.
+    window.onload = function() {
+
+        alert( "welcome" );
+        //When $.get() finishes getting the page myhtmlpage.html, it executes the myCallBack() function.
+        $.get( "./myhtmlpage.html", myCallBack );
+
+
+        $.get( "./myhtmlpage.html", function() {
+
+            myCallBack1( 1, 2 );
+
+        });
+    }
+
+    function myCallBack()
+    {
+        alert( "Eliav" );
+    }
+
+    function myCallBack1( param1, param2 )
+    {
+        alert( "Liel: " + param1 + " " + param2 );
+    }
+
+    $( document ).ready(function() {
+        $( "a" ).addClass( "test" );
+       // alert( "Shaili" );
+        $( "a" ).click(function( event ) {
+            alert( "Thanks for visiting!" );
+        });
+        // Slowly hide all paragraphs
+        //$( "a").hide( "slow" );
+
+        //$( "a" ).hide( 500 ).delay( 1500 ).show( 300 );
+
+    });
+
+
+
+</script>
+</body>
+</html>

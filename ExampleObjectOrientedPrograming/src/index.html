@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../javascript/Rectangle.js"> </script>
+    <script src="../javascript/DepthRectangle.js"> </script>
+    <script src="../javascript/ExtractArray.js"> </script>
+
+    <script type="text/javascript">
+        var myRect = new Rectangle(5,2);
+//        alert(myRect.area());
+//        alert(myRect.toString());
+//        alert(myRect instanceof Rectangle);
+        var myDepthRect = new DepthRectangle(5,2,3);
+
+        //alert(myRect instanceof DepthRectangle);
+        //alert(myDepthRect instanceof Rectangle);
+        //alert(myDepthRect.toString());
+
+        var testArray = new Array(0,1,"test","big string", new Date());
+        alert(testArray.longestElement());
+    </script>
+
+</head>
+<body>
+
+</body>
+</html>
