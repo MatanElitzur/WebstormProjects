@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+<script>
+    /*
+     The Pipe method is very powerful and useful, it allows you to “project” a promise.
+     Following the former example, we can do something like this:
+     */
+    var post = $.post("/echo/json/",
+            {
+                json: JSON.stringify({firstName: "Jose", lastName: "Romaniello"})
+            }
+    ).pipe(function(p){
+                return "Saved " + p.firstName;
+            });
+
+    post.done(function(r){ alert(r); });
+    /*
+     Here we are doing a projection of the result which is a “person” object.
+      So, instead of having a Deferred of person, we have now a deferred of “Saved {firstName}”.
+     */
+
+//*******************************************************************************************************
+    /*
+     Another very interesting feature of the pipe method is that you can
+     return a deferred from inside the pipe callback.
+     Imagine that we have two methods, one to get a Customer SSN by an internal
+     id fiscal and another one to get a Person’s address by SSN:
+     */
+    function getCustomerSSNById(customerId){
+        return $.post("/echo/json/", {
+            json: JSON.stringify({firstName: "Jose", lastName: "Romaniello", ssn: "123456789"})
+        }).pipe(function(p){
+            return p.ssn;
+        });
+    }
+
+    function getPersonAddressBySSN(ssn){
+        return $.post("/echo/json/", {
+            json: JSON.stringify({
+                ssn: "123456789",
+                address: "Siempre Viva 12345, Springfield" })
+        }).pipe(function(p){
+            return p.address;
+        });
+    }
+
+    function getPersonAddressById(id){
+        return getCustomerSSNById(id)
+                .pipe(getPersonAddressBySSN);
+    }
+
+
+    getPersonAddressById(123)
+            .done(function(a){
+                alert("The address is " + a);
+            });
+
+    /*
+     As you can see here,
+     I added a new method “getPersonAddressByID”. This method return a deferred which is a combination of the two methods.
+     If one of the methods in the pipeline fails the “master” deferred will fail.
+     Pipelines has some other usages, for instance, you can reject the deferred inside the pipe callback.
+     */
+//************************************************************************************************************
+    /*
+     Another interesting use case that I can think of for pipes,
+     are recursive deferred. Imagine that you started an asynchronous operation in the backend,
+     and you need to do “polling” to see if the task is done and when the task is done do something else;
+     */
+    //1: done, 2: cancelled, other: pending
+    function getPrintingStatus(){
+        var d = $.Deferred();
+        $.post(
+                "/echo/json/",
+                {
+                    json: JSON.stringify( {status: Math.floor(Math.random()*8+1)} ),
+                    delay: 2
+                }
+        ).done(function(s){
+                    d.resolve(s.status);
+                }).fail(d.reject);
+        return d.promise();
+    }
+
+    function pollUntilDone(){
+        //do something
+        return getPrintingStatus()
+                .pipe(function(s){
+                    if(s === 1 || s == 2) {
+                        return s;  //if the status is done or cancelled return the status
+                    }
+                    //if the status is pending... call this same function
+                    //and return a deferred...
+                    return pollUntilDone();
+                });
+    }
+
+    $.blockUI({message: "Loading..."});
+
+    pollUntilDone()
+            .pipe(function(s){ //project the status code to a meaningfull string.
+                switch(s){
+                    case 1:
+                        return "done";
+                    case 2:
+                        return "cancelled";
+                }
+            })
+            .done(function(s){
+                $.unblockUI();
+                alert("The status is " + s);
+            });
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+<!--
+ The Promise() method
+ The Deferred object has another important method named Promise().
+ This method returns an object with almost the same interface than the Deferred,
+ but it only have the methods to attach callbacks and does not have the methods to resolve and reject.
+ This is useful when you want to give to the calling API something to subscribe to,
+ but not the ability to resolve or reject the deferred. This code will fail because
+ the promise doesn't have a method "resolve":
+ -->
+<script>
+    /*
+function getPromise(){
+    return $.Deferred().promise();
+}
+
+try{
+    getPromise().resolve("a");
+}
+catch(err){
+    alert(err);
+}
+
+*/
+//******************************************************************************************************************
+<!-- The $.ajax method in JQuery returns a Promise, so you can do: -->
+    var post = $.ajax({
+        url: "/echo/json/",
+        data: {json: JSON.stringify({firstName: "Jose", lastName: "Romaniello"})} ,
+        type: "POST"
+    });
+
+    post.done(function(p){
+        alert(p.firstName +  " saved.");
+    });
+
+    post.fail(function(){
+        alert("error!");
+    });
+//This code does the same than the first snippet with the only difference
+// that you can add as many callbacks as you want, the syntax is clear because
+// we don’t need an extra parameter in the method.
+// On the other hand you can use the promise as a return value of other
+// function and one of the most interesting things for me is that you can do some operations with the promises.
+//*******************************************************************************************************************
+
+
+
+
+
+
+</script>
+</body>
+</html>

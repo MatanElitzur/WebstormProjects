@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+<script>
+/*
+ Another very useful method is $.when. The method accepts an arbitrary number of promises, and it returns a master deferred that:
+
+ will be “resolved” when all the promises are resolved,
+ will be rejected if any of the promises is rejected,
+ The done callback has the results of all the promises.
+
+ This is an example:
+ */
+
+function getCustomer(customerId){
+    var d = $.Deferred();
+    $.post(
+            "/echo/json/",
+            {json: JSON.stringify({firstName: "Jose", lastName: "Romaniello", ssn: "123456789"})}
+    ).done(function(p){
+                d.resolve(p);
+            }).fail(d.reject);
+    return d.promise();
+}
+
+function getPersonAddressBySSN(ssn){
+    return $.post("/echo/json/", {
+        json: JSON.stringify({
+            ssn: "123456789",
+            address: "Siempre Viva 12345, Springfield" })
+    }).pipe(function(p){
+        return p.address;
+    });
+}
+
+$.when(getCustomer(123), getPersonAddressBySSN("123456789"))
+        .done(function(person, address){
+            alert("The name is " + person.firstName + " and the address is " + address);
+        });
+/*
+ As you can see at the end of this example, then $.when returns a new
+ deferred and we are using the two results in the done callback.
+ Notice that I changed the getCustomer method; this is because the promise of an ajax call,
+  has the content payload as first element in the result, but also has other stuff like the status code.
+ */
+//******************************************************************************************************************
+    //In this  you can mix $.when and pipes as follows:
+function getCustomer(customerId){
+    var d = $.Deferred();
+    $.post(
+            "/echo/json/",
+            {json: JSON.stringify({firstName: "Jose", lastName: "Romaniello", ssn: "123456789"})}
+    ).done(function(p){
+                d.resolve(p);
+            }).fail(d.reject);
+    return d.promise();
+}
+
+function getPersonAddressBySSN(ssn){
+    return $.post("/echo/json/", {
+        json: JSON.stringify({
+            ssn: "123456789",
+            address: "Siempre Viva 12345, Springfield" })
+    }).pipe(function(p){
+        return p.address;
+    });
+}
+
+$.when(getCustomer(123), getPersonAddressBySSN("123456789"))
+        .pipe(function(person, address){
+            return $.extend(person, {address: address});
+        })
+        .done(function(person){
+            alert("The name is " + person.firstName + " and the address is " + person.address);
+        });
+
+//********************************************************************************************************
+    //Another interesting use case for the $.when operator,
+    // is when you need to load several things in the screen but you want only one big-loading message:
+function getCustomer(customerId){
+    var d = $.Deferred();
+    $.post(
+            "/echo/json/",
+            {json: JSON.stringify({firstName: "Jose", lastName: "Romaniello", ssn: "123456789"}),
+                delay: 4}
+    ).done(function(p){
+                d.resolve(p);
+            }).fail(d.reject);
+    return d.promise();
+}
+
+function getPersonAddressBySSN(ssn){
+    return $.post("/echo/json/", {
+        json: JSON.stringify({
+            ssn: "123456789",
+            address: "Siempre Viva 12345, Springfield" }),
+        delay: 2
+    }).pipe(function(p){
+        return p.address;
+    });
+}
+
+
+function load(){
+    $.blockUI({message: "Loading..."});
+    var loadingCustomer = getCustomer(123)
+            .done(function(c){
+                $("span#firstName").html(c.firstName)
+            });
+
+    var loadingAddress = getPersonAddressBySSN("123456789")
+            .done(function(address){
+                $("span#address").html(address)
+            });
+
+    $.when(loadingCustomer, loadingAddress)
+            .done($.unblockUI);
+}
+
+load();
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+<script>
+/*
+    var deferred = $.Deferred();
+
+    deferred.done(function(value) {
+        alert(value);
+    });
+
+    deferred.resolve("hello world");
+*/
+
+     //Another interesting point is that if you attach a callback to an already resolved deferred,
+     // it get executes immediately:
+     var deferred = $.Deferred();
+     deferred.resolve("hello world");
+     deferred.done(function(value) {
+        alert(value);
+     });
+
+
+</script>
+</body>
+</html>
