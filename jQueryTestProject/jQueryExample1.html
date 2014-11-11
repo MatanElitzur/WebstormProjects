@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+
+<script>
+    /*
+     Caching --> link Asynchronous cache
+
+     When it comes to asynchronous tasks, caching can be a bit demanding since you have to make sure a task is only
+      performed once for a given key. As a consequence, the code has to somehow keep track of inbound tasks.
+
+     The caching mechanism has to make sure the URL is only requested once even if the script isn't in cache yet.
+      This shows some logic to keep track of callbacks bound
+      to a given URL in order for the cache system to properly handle both complete and inbound requests.
+
+     One promise is cached per URL. If there is no promise for the given URL yet,
+      then a deferred is created and the request is issued.
+      If it already exists, however, the callback is attached to the existing deferred.
+       The big advantage of this solution is that it will handle both complete and inbound requests transparently.
+        Another advantage is that a deferred-based cache will deal with failure gracefully.
+      The promise will end up rejected which can be tested for by providing an error callback:
+     */
+
+    /*
+    var cachedScriptPromises = {};
+
+    $.cachedGetScript = function( url, callback )
+    {
+        if ( !cachedScriptPromises[ url ] )
+        {
+            cachedScriptPromises[ url ] = $.Deferred(function( defer ) {
+                $.getScript( url ).then( defer.resolve, defer.reject );
+            }).promise();
+        }
+        return cachedScriptPromises[ url ].done( callback(url) );
+    };
+
+    function callBackFunction(arg)
+    {
+        alert("Got script from " + arg);
+    };
+
+    $.cachedGetScript( "http://www.ynet.co.il/", callBackFunction );
+    $.cachedGetScript( "http://www.ynet.co.il/", callBackFunction );
+*/
+
+    var cachedScriptPromises = {};
+
+    $.cachedGetScript = function( url, callback )
+    {
+        if ( !cachedScriptPromises[ url ] )
+        {
+            cachedScriptPromises[ url ] = $.Deferred(function( defer ) {
+                $.getScript( url ).then( defer.resolve, defer.reject );
+            }).promise();
+        }
+        return cachedScriptPromises[ url ].done( callback(url) );
+    };
+
+    function callBackFunction(arg)
+    {
+        alert("Got script from " + arg);
+    };
+
+    function successCallback()
+    {
+        alert("successCallback function");
+    }
+
+    function errorCallback()
+    {
+        alert("errorCallback function")
+    }
+
+    $.cachedGetScript( "http://www.ynet.co.il/", callBackFunction );
+    $.cachedGetScript( "http://www.ynet.co.il/", callBackFunction );
+    $.cachedGetScript( "http://www.ynet.co.il/", callBackFunction ).then( successCallback, errorCallback );
+
+</script>
+
+</body>
+</html>
