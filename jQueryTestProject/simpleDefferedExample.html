@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+
+
+<script>
+
+    //Create a Promise for DOM ready and the two AJAX requests and wait for all of them to be fulfilled:
+
+    function getReady() {
+        var deferredReady = $.Deferred();
+        $(document).ready(function() {
+            deferredReady.resolve();
+        });
+        return deferredReady.promise();
+    }
+
+    var firstRequest = $.ajax({ url: 'http://www.html5rocks.com/en/tutorials/file/xhr2/' }),
+    secondRequest = $.ajax({ url: 'http://www.html5rocks.com/en/tutorials/audio/scheduling/' });
+
+    $.when( getReady(), firstRequest, secondRequest
+    ).done( function( readyResponse, firstResponse, secondResponse ) {
+                var insertDiv1 = $('<div></div>');
+                insertDiv1.html($(firstResponse[0]).find('section').html());
+                var insertDiv2 = $('<div></div>');
+                insertDiv2.html($(secondResponse[0]).find('section').html());
+                $('body').append(insertDiv1, '<hr/>', insertDiv2);
+            });
+
+</script>
+
+<H1>Hello this is a simple example</H1>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+
+
+<script>
+
+    //The AJAX request can be already fired off while we wait for the
+    // DOM (also showing how can we chain listeners with then()
+
+    function getReady() {
+        var deferredReady = $.Deferred();
+        $(document).ready(function() {
+            deferredReady.resolve();
+        });
+        return deferredReady.promise();
+    }
+
+    var firstRequest = $.ajax({ url: 'http://www.html5rocks.com/en/tutorials/file/xhr2/' }),
+            secondRequest = $.ajax({ url: 'http://www.html5rocks.com/en/tutorials/audio/scheduling/' }),
+            firstDiv,
+            secondDiv;
+
+    $.when( firstRequest, secondRequest
+    ).then( function( firstResponse, secondResponse ) {
+                firstDiv = $('<div></div>').html($(firstResponse[0]).find('section').html());
+                secondDiv = $('<div></div>').html($(secondResponse[0]).find('section').html());
+                return getReady();
+            }).done( function( readyResponse, firstResponse, secondResponse ) {
+                $('body').append(firstDiv, '<hr/>', secondDiv);
+            });
+
+</script>
+
+<H1>The AJAX request can be already fired off while we wait for the
+    DOM (also showing how can we chain listeners with then()</H1>
+
+</body>
+</html>
