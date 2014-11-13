@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+<script>
+//******************************************************************************************************
+    /*
+        This code is from DeferredGenericAsynchronousCache.html file
+    */
+    $.createCache = function( requestFunction ) {
+        var cache = {};
+        return function( key, callback ) {
+            if ( !cache[ key ] ) {
+                cache[ key ] = $.Deferred(function( defer ) {
+                    requestFunction( defer, key );
+                }).promise();
+            }
+            return cache[ key ].done( callback );
+        };
+    }
+//****************************************************************************************************************
+    /*
+     Image loading
+
+     A cache can be used to ensure that the same image is not loaded multiple times.
+     */
+
+    $.loadImage = $.createCache(function( defer, url ) {
+        var image = new Image();
+        function cleanUp() {
+            image.onload = image.onerror = null;
+        }
+        defer.then( cleanUp, cleanUp );
+        image.onload = function() {
+            defer.resolve( url );
+        };
+        image.onerror = defer.reject;
+        image.src = url;
+    });
+
+    function successFunc()
+    {
+        alert("successFunc image loading");
+    }
+
+    $.loadImage( "./img/jQueryImage.png" ).done( successFunc );
+    $.loadImage( "./img/jQueryImage.png" ).done( successFunc );
+
+    //will work regardless of whether my-image.png has already been loaded or not, or if it is actually in the process of being loaded.
+
+</script>
+</body>
+</html>
