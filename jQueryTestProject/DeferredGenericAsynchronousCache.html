@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+
+<script>
+
+    /*
+     Generic asynchronous cache
+
+     It is also possible to make the code completely generic and build a cache factory that will abstract out the actual task to be performed when a key isn't in the cache yet:
+     */
+
+    $.createCache = function( requestFunction ) {
+        var cache = {};
+        return function( key, callback ) {
+            if ( !cache[ key ] ) {
+                cache[ key ] = $.Deferred(function( defer ) {
+                    requestFunction( defer, key );
+                }).promise();
+            }
+            return cache[ key ].done( callback );
+        };
+    }
+
+    /*
+     Now that the request logic is abstracted away, cachedGetScript can be rewritten as follows:
+     */
+    $.cachedGetScript = $.createCache(function( defer, url ) {
+        $.getScript( url ).then( defer.resolve, defer.reject );
+    });
+
+    /*
+     This will work because every call to createCache will create a new cache repository and return a new cache-retrieval function.
+     */
+</script>
+
+</body>
+</html>
