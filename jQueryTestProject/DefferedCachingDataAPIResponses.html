@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="jquery-2.1.1.js"></script>
+</head>
+<body>
+
+<script>
+
+    //******************************************************************************************************
+    /*
+     This code is from DeferredGenericAsynchronousCache.html file
+     */
+    $.createCache = function( requestFunction ) {
+        var cache = {};
+        return function( key, callback ) {
+            if ( !cache[ key ] ) {
+                cache[ key ] = $.Deferred(function( defer ) {
+                    requestFunction( defer, key );
+                }).promise();
+            }
+            return cache[ key ].done( callback );
+        };
+    }
+    //****************************************************************************************************************
+
+    /*
+     Caching Data API responses
+
+     API requests that are considered immutable during the lifetime of your page are also perfect candidates. For instance, the following:
+     */
+    $.searchTwitter = $.createCache(function( defer, query ) {
+        $.ajax({
+            url: "http://search.twitter.com/search.json",
+            data: {
+                q: query
+            },
+            dataType: "jsonp",
+            success: defer.resolve,
+            error: defer.reject
+        });
+    });
+
+    //will allow you to perform searches on Twitter and cache them at the same time:
+
+    function successFunc()
+    {
+        alert("successFunc Caching Data API responses");
+    }
+
+    $.searchTwitter( "jQuery Deferred", successFunc );
+    $.searchTwitter( "jQuery Deferred", successFunc );
+</script>
+</body>
+</html>
